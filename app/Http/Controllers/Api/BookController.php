@@ -3,17 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Book;
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class BookController extends Controller
 {
-
-    public function book() {
-        $data = "Data All Book";
-        return response()->json($data, 200);
-    }
 
     public function bookAuth() {
         $data = "Welcome " . Auth::user()->name;
@@ -25,9 +22,14 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($create_by = "")
     {
-        //
+        $data = (object)
+        [
+           'books' => Book::where('create_by',$create_by)->get()
+        ];
+
+        return response()->json(compact('data'));
     }
 
     /**
@@ -48,7 +50,37 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->all();
+
+        $validator = Validator::make($data,[
+           'name' => 'required',
+           'type' => 'required',
+           'price' => 'required',
+           'stock' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+               'status' => "fail",
+                'messages' => $validator->errors()->first(),
+            ],400);
+        }
+
+        $input = [
+          'name' => $data['name'],
+          'type' => $data['type'],
+          'price' => $data['price'],
+          'stock' => $data['stock'],
+          'create_by' => Auth::user()->id,
+        ];
+
+        Book::firstOrCreate($input);
+
+        return response()->json([
+           'status' => 'ok',
+           'messages' => 'Berhasil membuat data'
+        ]);
+
     }
 
     /**
@@ -70,7 +102,8 @@ class BookController extends Controller
      */
     public function edit($id)
     {
-        //
+        $data = Book::find($id);
+        return $data;
     }
 
     /**
@@ -82,7 +115,37 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $data = $request->all();
+
+        $validator = Validator::make($data,[
+            'name' => 'required',
+            'type' => 'required',
+            'price' => 'required',
+            'stock' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+               'status' => 'fail',
+               'messages'=> $validator->errors()->first(),
+            ],400);
+        }
+
+        $input = [
+            'name' => $data['name'],
+            'type' => $data['type'],
+            'price' => $data['price'],
+            'stock' => $data['stock'],
+            'create_by' => Auth::user()->id,
+        ];
+
+        Book::find($id)->update($input);
+
+        return response()->json([
+            'status' => 'ok',
+            'messages' => 'Berhasil update data'
+        ]);
+
     }
 
     /**
@@ -93,6 +156,10 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Book::destroy($id);
+        return response()->json([
+           'status' => 'ok',
+           'messages' => 'Berhasil menghapus data'
+        ]);
     }
 }

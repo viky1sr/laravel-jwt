@@ -20,7 +20,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('register', 'Api\UserController@register');
 Route::post('login', 'Api\UserController@login');
-Route::get('book', 'Api\BookController@book');
+//Route::get('book', 'Api\BookController@book');
 
 Route::get('bookall', 'Api\BookController@bookAuth')->middleware('jwt.verify');
 Route::get('user', 'Api\UserController@getAuthenticatedUser')->middleware('jwt.verify');
+
+Route::apiResource('books', 'Api\BookController')->middleware('jwt.verify');
+Route::get('book/{create_by}', 'Api\BookController@index')->middleware('jwt.verify');
