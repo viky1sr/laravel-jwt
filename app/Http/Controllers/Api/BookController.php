@@ -17,6 +17,12 @@ class BookController extends Controller
         return response()->json($data, 200);
     }
 
+    public function books()
+    {
+        $books = Book::all();
+        return response()->json(compact('books'));
+    }
+
     /**
      * Display a listing of the resource.
      *

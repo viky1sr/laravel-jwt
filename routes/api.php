@@ -25,5 +25,6 @@ Route::post('login', 'Api\UserController@login');
 Route::get('bookall', 'Api\BookController@bookAuth')->middleware('jwt.verify');
 Route::get('user', 'Api\UserController@getAuthenticatedUser')->middleware('jwt.verify');
 
-Route::apiResource('books', 'Api\BookController')->middleware('jwt.verify');
-Route::get('book/{create_by}', 'Api\BookController@index')->middleware('jwt.verify');
+Route::apiResource('book', 'Api\BookController')->middleware('jwt.verify');
+Route::get('book_by/{create_by}', 'Api\BookController@index')->middleware('jwt.verify');
+Route::get('books', 'Api\BookController@books')->middleware('jwt.verify');
