@@ -48,8 +48,22 @@ class Handler extends ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request,Throwable $exception)
     {
+        if($exception instanceof \Illuminate\Session\TokenMismatchException)
+        {
+            return redirect('/v1/login')->with('exception', 'Session anda telah kadaluarsa, silahkan login kembali');
+        }
+
+        if($exception instanceof \Illuminate\Routing\Exceptions\InvalidSignatureException)
+        {
+            return redirect('/v1/login')->with('exception', 'Url tidak valid.');
+        }
+        if($exception instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException)
+        {
+            return redirect('/v1/login')->with('exception', 'Url tidak ditemukan.');
+        }
+
         return parent::render($request, $exception);
     }
 }
